@@ -9,7 +9,6 @@ const knex = require('./db/knex');
 const index = require('./routes/indexRoutes');
 const auth = require('./routes/authRoutes')
 
-
 const app = express();
 
 app.use(logger('dev'));
@@ -18,7 +17,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/', index);
-app.use('/auth', auth)
+app.use('/auth', auth);
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.listen(port, function() {
 console.log("listening on port: ", port);

@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
     table.increments();
     table.string("first_name");
     table.string("last_name");
-    table.string("email_address");
+    table.string("email");
     table.string("password");
     table.string("phone_number");
     table.string("job_title");

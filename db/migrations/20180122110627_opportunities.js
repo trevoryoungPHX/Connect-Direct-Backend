@@ -1,8 +1,8 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('opportunities', function(table) {
     table.increments();
-    table.txt("title");
-    table.txt("description");
+    table.text("title");
+    table.text("description");
     table.string("location_name");
     table.string("address");
     table.string("city");

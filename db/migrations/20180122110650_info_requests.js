@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('info_requests', function(table) {
     table.increments();
-    table.txt("message");
+    table.text("message");
     table.integer("opportunity_id")
       .references('id')
       .inTable("opportunities")
