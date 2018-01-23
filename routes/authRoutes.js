@@ -15,7 +15,7 @@ router.post('/signup', function(req, res) {
   })
 })
 
-router.post('userLogin', function(req, res) {
+router.post('/login', function(req, res) {
   knex('users')
     .where('email', req.body.email)
     .then(user => {
