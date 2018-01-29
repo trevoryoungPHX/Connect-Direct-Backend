@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
     table.string("phone_number");
     table.string("job_title");
     table.string("company_name");
-    table.string("linkedin_url");
+    table.string("linkedin_url").defaultTo(null);
     table.timestamps(true,true);
   });
 };
