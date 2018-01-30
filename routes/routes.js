@@ -21,11 +21,15 @@ router.post('/user/login', function(req, res) {
     .then(user => {
       if (user.length > 0) {
         encryptor.check(user[0], req.body).then((isValid)=>{
-          let token = jwt.sign({user:user[0]}, secret)
-          res.json({
-            user:user[0],
-            token:token
-          })
+          if(isValid) {
+            let token = jwt.sign({user:user[0]}, secret)
+            res.json({
+              user:user[0],
+              token:token
+            })
+          } else {
+            res.status(401).json('Invalid Login')
+          }
         })
       } else {
         res.status(401).json('Invalid Login')
@@ -48,11 +52,15 @@ router.post('/seeker/login', function(req, res) {
     .then(user => {
       if (user.length > 0) {
         encryptor.check(user[0], req.body).then((isValid)=>{
-          let token = jwt.sign({user:user[0]}, secret)
-          res.json({
-            user:user[0],
-            token:token
-          })
+          if(isValid) {
+            let token = jwt.sign({user:user[0]}, secret)
+            res.json({
+              user:user[0],
+              token:token
+            })
+          } else {
+            res.status(401).json('Invalid Login')
+          }
         })
       } else {
         res.status(401).json('Invalid Login')
@@ -66,11 +74,15 @@ router.post('/admin/login', function(req, res) {
     .then(user => {
       if (user.length > 0) {
         encryptor.check(user[0], req.body).then((isValid)=>{
-          let token = jwt.sign({user:user[0]}, secret)
-          res.json({
-            user:user[0],
-            token:token
-          })
+          if(isValid){
+            let token = jwt.sign({user:user[0]}, secret)
+            res.json({
+              user:user[0],
+              token:token
+            })
+          }else{
+            res.status(401).json('Invalid Login')
+          }
         })
       } else {
         res.status(401).json('Invalid Login')
@@ -80,15 +92,29 @@ router.post('/admin/login', function(req, res) {
 
 router.use(jwtAuth);
 
+// GET user info to display first name on user page
+
+router.get('/userInfo', function(req, res) {
+  knex('users').select("users.first_name").where('users.id', req.decoded.user.id).then(user => res.json(user[0]))
+})
+
+// GET seeker info to display first name on user page
+
+router.get('/seekerInfo', function(req, res) {
+  knex('seekers').select("seekers.first_name").where('seekers.id', req.decoded.user.id).then(seeker => res.json(seeker[0]))
+})
+
 // GET request for all opportunities, join with seeker table
 
-router.get('/opportunities', function(req, res) {
+router.get('/allOpportunities', function(req, res) {
   knex('opportunities')
-  .join("seekers", "seeker_id", "seeker.id")
+  .join("seekers", "seekers.id", "opportunities.seeker_id")
   .select("opportunities.*", "seekers.*")
   .then(opportunities => res.json(opportunities))
-  
 });
+
+
+
 
 router.get('/portal/users', function(req, res) {
   knex('users').select().then(users => res.json(users))
