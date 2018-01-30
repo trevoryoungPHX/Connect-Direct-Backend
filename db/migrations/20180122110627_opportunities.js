@@ -3,6 +3,7 @@ exports.up = function(knex, Promise) {
     table.increments();
     table.text("title");
     table.text("description");
+    table.string("website_url").defaultTo(null);
     table.string("location_name");
     table.string("address");
     table.string("city");
