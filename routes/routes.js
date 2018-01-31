@@ -95,13 +95,13 @@ router.use(jwtAuth);
 // GET user info to display first name on user page
 
 router.get('/userInfo', function(req, res) {
-  knex('users').select("users.first_name").where('users.id', req.decoded.user.id).then(user => res.json(user[0]))
+  knex('users').where('users.id', req.decoded.user.id).then(user => res.json(user[0]))
 })
 
 // GET seeker info to display first name on user page
 
 router.get('/seekerInfo', function(req, res) {
-  knex('seekers').select("seekers.first_name").where('seekers.id', req.decoded.user.id).then(seeker => res.json(seeker[0]))
+  knex('seekers').where('seekers.id', req.decoded.user.id).then(seeker => res.json(seeker[0]))
 })
 
 // GET request for all opportunities, join with seeker table
@@ -109,14 +109,15 @@ router.get('/seekerInfo', function(req, res) {
 router.get('/allOpportunities', function(req, res) {
   knex('opportunities')
   .join("seekers", "seekers.id", "opportunities.seeker_id")
-  .select("opportunities.*", "seekers.*")
+  .select("opportunities.id as op_id", "opportunities.*", "seekers.*")
   .then(opportunities => res.json(opportunities))
 });
 
 // POST requst to info_request table on a specific opportunity
 
-router.post('/infoRequest', function(req, res) {
-  knex('info_requests').insert(req.body).then(() => {
+router.post('/postInfo', function(req, res) {
+  console.log(req.body);
+  knex('info_requests').insert({opportunity_id:req.body.opportunity_id, message:req.body.message, user_id: req.decoded.user.id}).then(() => {
     knex('info_requests').select().then(info_requests => res.json(info_requests))
   });
 });
@@ -134,7 +135,7 @@ router.patch('/users/:id', function(req, res) {
 
 router.post('/opportunities', function(req, res) {
   knex('opportunities').insert({...req.body, seeker_id: req.decoded.user.id}).then(() => {
-    knex('opportunities').select().then(opportunities => res.json(opportunities))
+    knex('opportunities').select().orderBy("id", "DESC").then(opportunities => res.json(opportunities))
   });
 });
 
@@ -152,6 +153,7 @@ router.get('/posts/getone', function(req, res) {
   knex('opportunities')
       .select()
       .where('opportunities.seeker_id', req.decoded.user.id)
+      .orderBy("id", "DESC")
       .then((results)=> {
         knex('info_requests')
         .join('users', 'info_requests.user_id', 'users.id')
