@@ -113,21 +113,14 @@ router.get('/allOpportunities', function(req, res) {
   .then(opportunities => res.json(opportunities))
 });
 
-
-
-
-router.get('/portal/users', function(req, res) {
-  knex('users').select().then(users => res.json(users))
-});
-
 // POST requst to info_request table on a specific opportunity
 
-// router.post("/inforequest" function(req, res) {
-//   knex('info_requests')
-//   .insert({
-//
-//   })
-// })
+router.post('/infoRequest', function(req, res) {
+  knex('info_requests').insert(req.body).then(() => {
+    knex('info_requests').select().then(info_requests => res.json(info_requests))
+  });
+});
+
 
 // PATCH request on user profile page to update their info
 
@@ -140,7 +133,7 @@ router.patch('/users/:id', function(req, res) {
 // POST for seeker to post a new opportunity
 
 router.post('/opportunities', function(req, res) {
-  knex('opportunities').insert(req.body).then(() => {
+  knex('opportunities').insert({...req.body, seeker_id: req.decoded.user.id}).then(() => {
     knex('opportunities').select().then(opportunities => res.json(opportunities))
   });
 });

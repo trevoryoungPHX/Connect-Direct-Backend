@@ -7,11 +7,9 @@ module.exports = {
     return new Promise((resolve, reject)=>{
       bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
           if (err) reject(err);
-          console.log("hey guys");
           // hash the password using our new salt
           bcrypt.hash(user.password, salt,()=>{}, function(err, hash) {
               if (err) reject(err);
-              console.log("we out here fam");
               // override the cleartext password with the hashed one
               user.password = hash;
               resolve(user);
