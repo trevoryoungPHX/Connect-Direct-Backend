@@ -17,6 +17,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/', routes);
 
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
 
 app.listen(port, function() {
 console.log("listening on port: ", port);

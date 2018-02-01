@@ -123,13 +123,22 @@ router.post('/postInfo', function(req, res) {
 });
 
 
-// PATCH request on user profile page to update their info
+// POST request on user profile page to update their info
 
-router.patch('/users/:id', function(req, res) {
-  knex('users').update(req.body).where('id', req.params.id).then(function() {
-    knex('users').select().then(users => res.json(users))
+router.post('/updateUser', function(req, res) {
+  knex('users').update({first_name:req.body.user.first_name, last_name: req.body.user.last_name, email:req.body.user.email, job_title: req.body.user.job_title, company_name:req.body.user.company_name, linkedin_url:req.body.user.linkedin_url}).where('id', req.decoded.user.id).then(function() {
+    res.json("success")
   });
 });
+
+// POST request on user seeker page to update their info
+
+router.post('/updateSeeker', function(req, res) {
+  knex('seekers').update({first_name:req.body.seeker.first_name, last_name: req.body.seeker.last_name, email:req.body.seeker.email, job_title: req.body.seeker.job_title, organization_name:req.body.seeker.organization_name}).where('id', req.decoded.user.id).then(function() {
+    res.json("success")
+  });
+});
+
 
 // POST for seeker to post a new opportunity
 
@@ -140,12 +149,12 @@ router.post('/opportunities', function(req, res) {
 });
 
 // DELETE request for seeker to delete an old post
-
-router.delete('/opportunities/delete/:id', function(req, res) {
-  knex('opportunities').del().where('id', req.params.id).then(function() {
-    knex('opportunities').select().then(opportunities => res.json(opportunities))
-  });
-});
+//
+// router.delete('/opportunities', function(req, res) {
+//   knex('opportunities').del().where({opportunity_id: req.decoded.opportuniy.id}).then(() => {
+//     knex('opportunities').select().then(opportunities => res.json(opportunities))
+//    });
+// });
 
 // GET request for all seekers posts double joined with info requsts and users.
 
@@ -167,14 +176,6 @@ router.get('/posts/getone', function(req, res) {
         })
   }
 )
-});
-
-// PATCH request on user seeker page to update their info
-
-router.patch('/seekers/:id', function(req, res) {
-  knex('seekers').update(req.body).where('id', req.params.id).then(function() {
-    knex('seekers').select().then(seekers => res.json(seekers))
-  });
 });
 
 //4 get alls for admin panel
@@ -224,6 +225,7 @@ router.delete('/portal/info_requests/delete/:id', function(req, res) {
 
 
 // Anything below this is protected and has access too req.decoded
+
 
 
 
