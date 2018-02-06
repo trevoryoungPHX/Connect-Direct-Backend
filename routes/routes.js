@@ -11,7 +11,7 @@ router.post('/user/signup', function(req, res) {
       knex('users')
         .insert(user)
         .returning('*')
-        .then(newUser => res.json(newUser[0]))
+        .then(newUser => res.json({user:newUser[0], msg:"Account created! Click the link above to sign!"}))
     })
 })
 
@@ -28,11 +28,11 @@ router.post('/user/login', function(req, res) {
               token:token
             })
           } else {
-            res.status(401).json('Invalid Login')
+            res.status(401).json({errMsg:"Invalid Login - Please Try Again"})
           }
         })
       } else {
-        res.status(401).json('Invalid Login')
+        res.status(401).json({errMsg:"Invalid Login - Please Try Again"})
       }
     })
 })
@@ -42,7 +42,7 @@ router.post('/seeker/signup', function(req, res) {
       knex('seekers')
         .insert(user)
         .returning('*')
-        .then(newUser => res.json(newUser[0]))
+        .then(newUser => res.json({user:newUser[0], msg:"Account created! Click the link above to sign!"}))
     })
 })
 
@@ -59,11 +59,11 @@ router.post('/seeker/login', function(req, res) {
               token:token
             })
           } else {
-            res.status(401).json('Invalid Login')
+            res.status(401).json({errMsg:"Invalid Login - Please Try Again"})
           }
         })
       } else {
-        res.status(401).json('Invalid Login')
+        res.status(401).json({errMsg:"Invalid Login - Please Try Again"})
       }
     })
 })
@@ -81,11 +81,11 @@ router.post('/admin/login', function(req, res) {
               token:token
             })
           }else{
-            res.status(401).json('Invalid Login')
+            res.status(401).json({errMsg:"Access DENIED"})
           }
         })
       } else {
-        res.status(401).json('Invalid Login')
+        res.status(401).json({errMsg:"Access DENIED"})
       }
     })
 })
@@ -113,15 +113,6 @@ router.get('/allOpportunities', function(req, res) {
   .then(opportunities => res.json(opportunities))
 });
 
-// POST requst to info_request table on a specific opportunity
-
-router.post('/postInfo', function(req, res) {
-  console.log(req.body);
-  knex('info_requests').insert({opportunity_id:req.body.opportunity_id, message:req.body.message, user_id: req.decoded.user.id}).then(() => {
-    knex('info_requests').select().then(info_requests => res.json(info_requests))
-  });
-});
-
 
 // POST request on user profile page to update their info
 
@@ -139,22 +130,31 @@ router.post('/updateSeeker', function(req, res) {
   });
 });
 
+// POST requst to info_request table on a specific opportunity
+
+router.post('/postInfo', function(req, res) {
+  console.log(req.body);
+  knex('info_requests').insert({opportunity_id:req.body.opportunity_id, message:req.body.message, user_id: req.decoded.user.id}).then(() => {
+    knex('info_requests').select().then(info_requests => res.json({info_requests:info_requests, msg:"Message sent! The organizer will receive your email address and LinkedIn profile and will get back to you if they are interested."}))
+  });
+});
 
 // POST for seeker to post a new opportunity
 
 router.post('/opportunities', function(req, res) {
   knex('opportunities').insert({...req.body, seeker_id: req.decoded.user.id}).then(() => {
-    knex('opportunities').select().orderBy("id", "DESC").then(opportunities => res.json(opportunities))
+    knex('opportunities').select().orderBy("id", "DESC").then(opportunities => res.json({opportunities:opportunities, msg:"New Post Submitted! See Below."}))
   });
 });
 
 // DELETE request for seeker to delete an old post
-//
-// router.delete('/opportunities', function(req, res) {
-//   knex('opportunities').del().where({opportunity_id: req.decoded.opportuniy.id}).then(() => {
-//     knex('opportunities').select().then(opportunities => res.json(opportunities))
-//    });
-// });
+
+router.delete('/opportunities/:id', function(req, res) {
+  console.log(req.params.id);
+  knex('opportunities').del().where({id: req.params.id}).then(() => {
+    knex('opportunities').select().then(opportunities => res.json(opportunities))
+   });
+});
 
 // GET request for all seekers posts double joined with info requsts and users.
 
